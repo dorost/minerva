@@ -1,0 +1,133 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% University/School Laboratory Report
+% LaTeX Template
+% Version 3.1 (25/3/14)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Linux and Unix Users Group at Virginia Tech Wiki 
+% (https://vtluug.org/wiki/Example_LaTeX_chem_lab_report)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass{article}
+
+\usepackage[version=3]{mhchem} % Package for chemical equation typesetting
+\usepackage{siunitx} % Provides the \SI{}{} and \si{} command for typesetting SI units
+\usepackage{graphicx} % Required for the inclusion of images
+\usepackage{natbib} % Required to change bibliography style to APA
+\usepackage{amsmath} % Required for some math elements 
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs
+
+\renewcommand{\labelenumi}{\alph{enumi}.} % Make numbering in the enumerate environment by letter rather than number (e.g. section 6)
+
+%\usepackage{times} % Uncomment to use the Times New Roman font
+
+%----------------------------------------------------------------------------------------
+%	DOCUMENT INFORMATION
+%----------------------------------------------------------------------------------------
+
+\title{Building a General Problem Solver from scratch} % Title
+
+\author{Amin \textsc{Dorostanian}} % Author name
+
+\date{\today} % Date for the report
+
+\begin{document}
+
+\maketitle % Insert the title, author and date
+
+
+% If you wish to include an abstract, uncomment the lines below
+% \begin{abstract}
+% Abstract text
+% \end{abstract}
+
+%----------------------------------------------------------------------------------------
+%	SECTION 1
+%----------------------------------------------------------------------------------------
+
+\section{Objective}
+
+We aim to build a General Pupose Problem Solver which is able to solve different kind of problems as humans
+are able to do. There has been extensive research on applications of Machine Learning, and in a few specific applications machines were able to outperform humans. [give some examples and references]
+
+All these advancements in building highly specialized AI powered machines were not successful in building an intelligence nearing human mind. This can be due to several reasons.
+
+% If you have more than one objective, uncomment the below:
+%\begin{description}
+%\item[First Objective] \hfill \\
+%Objective 1 text
+%\item[Second Objective] \hfill \\
+%Objective 2 text
+%\end{description}
+
+\section{Motivation}
+The question is why is it important to be able to model a mathematical proof for a theorem?
+One of the answers might be the relation between how human brain works to solve different problems.
+
+Being able to reason and build up theorems is the key to understand complicated concepts and apply it in the real world. 
+
+In Mathematics we can define worlds with different constraints, worlds that don't even (but can) exist. There are two important things here to take into account. 
+\begin{enumerate}
+\item The knwoledge to find appropriate constraints and representing them in descriptive way.
+\item The knowledge to infer/induct a theorem from finite set of principles.
+\end{enumerate}
+
+
+It is hard to understand the concepts before defining the terms appropriately and precisely. So it might be better to redefine some terms from scratch in this new framework.
+
+
+\begin{center}\(assumptions \rightarrow statement\)\end{center}
+
+Principles are also assumptions that are \textsc{true} always.
+
+\section{Terminology}
+
+We are going to redefine concepts and terms used in a new framework that we are going to build.
+
+This framework tells us that all mathematical statemnts that hold true are facts which were there but discovered and understood by us based on breaking them down to principles we can understand with our limited perception.
+
+\label{definitions}
+\begin{description}
+\item[Principles]
+The relationship between the relative quantities of substances taking part in a reaction or forming a compound, typically a ratio of whole integers.
+\item[Definition]
+The mass of an atom of a chemical element expressed in atomic mass units. It is approximately equivalent to the number of protons and neutrons in the atom (the mass number) or to the average number allowing for the relative abundances of different isotopes. 
+\end{description} 
+ 
+%----------------------------------------------------------------------------------------
+%	SECTION 2
+%----------------------------------------------------------------------------------------
+
+
+
+% \begin{figure}[h]
+% \begin{center}
+% \includegraphics[width=0.65\textwidth]{placeholder} % Include the image placeholder.png
+% \caption{Figure caption.}
+% \end{center}
+% \end{figure}
+
+%----------------------------------------------------------------------------------------
+%	BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
+
+% \bibliographystyle{apalike}
+
+% \bibliography{sample}
+
+%----------------------------------------------------------------------------------------
+
+
+\end{document}
