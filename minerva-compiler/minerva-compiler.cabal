@@ -1,0 +1,65 @@
+-- This file has been generated from package.yaml by hpack version 0.28.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: f22dab28b3a39500448fa452a9235fd357e0ac1615a530bc4540229079cb4f0b
+
+name:           minerva-compiler
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/minerva#readme>
+homepage:       https://github.com/githubuser/minerva#readme
+bug-reports:    https://github.com/githubuser/minerva/issues
+author:         Daniël Heres
+maintainer:     danielheres@gmail.com
+copyright:      2018 Daniël Heres
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+cabal-version:  >= 1.10
+extra-source-files:
+    ChangeLog.md
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/minerva
+
+library
+  exposed-modules:
+      Parser
+  other-modules:
+      Paths_minerva_compiler
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+    , megaparsec
+    , text
+  default-language: Haskell2010
+
+executable minerva-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_minerva_compiler
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , megaparsec
+    , minerva-compiler
+    , text
+  default-language: Haskell2010
+
+test-suite minerva-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_minerva_compiler
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , minerva-compiler
+  default-language: Haskell2010
