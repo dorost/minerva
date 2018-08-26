@@ -7,4 +7,5 @@ Minerva is build with `Haskell` using the stack build tool.
 You can build it by installing `stack` and build it using `stack`.
 
 `curl -sSL https://get.haskellstack.org/ | sh`
+
 `stack run`
