@@ -14,6 +14,6 @@ main = do
 
     case parseResult of
         Left err ->
-            Prelude.putStrLn ("Error: " <> show err <> "" )
+            Prelude.putStrLn ("Error: " <> show err)
         Right ast ->
             print ast

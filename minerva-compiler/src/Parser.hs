@@ -7,8 +7,18 @@ import Text.Megaparsec
 import Text.Megaparsec.Char
 
 
+data Expr
+    = App Text Expr
+    | Const Text
+    deriving Show
+
+data FunType
+    = FunType Text [Text]
+    deriving Show
+
 data TypeOrFunDef
     = TypeDef Text [TypeConstructor]
+    | FunDef Text [FunType] Text Expr
     deriving Show
 
 type Minerva = [TypeOrFunDef]
@@ -21,6 +31,10 @@ type Parser = Parsec () Text
 
 skipSpacing :: Parser Text
 skipSpacing =
+    takeWhileP Nothing (\c -> c == ' ' || c == '\n')
+
+skipSpacing1 :: Parser Text
+skipSpacing1 =
     takeWhile1P Nothing (\c -> c == ' ' || c == '\n')
 
 noSpacing :: Parser Text
@@ -35,17 +49,47 @@ typeConstructor = do
     skipSpacing
     return (TypeConstructor instanceName)
 
+expr :: Parser Expr
+expr = do
+    ref <- noSpacing
 
-typeOrFunDef :: Parser TypeOrFunDef
-typeOrFunDef = do
+    return (Const ref)
+
+typeDef :: Parser TypeOrFunDef
+typeDef = do
     typeName <- noSpacing
-    skipSpacing
-    string "=:"
-    skipSpacing
+    skipSpacing1
+    string "="
+    skipSpacing1
     char '{'
     typeConstructors <- typeConstructor `sepBy` char ','
     char '}'
     return (TypeDef typeName typeConstructors)
+
+funType :: Parser FunType
+funType = do
+    -- TODO
+    return (FunType "" [])
+
+funDef :: Parser TypeOrFunDef
+funDef = do
+    funName <- noSpacing
+    skipSpacing1
+    char ':'
+    skipSpacing
+    typeArgs <- sepBy funType (string "->")
+    skipSpacing
+    returnType <- noSpacing
+    skipSpacing1
+    char '='
+    skipSpacing1
+    exp <- expr
+    skipSpacing
+    return (FunDef funName typeArgs returnType exp)
+
+typeOrFunDef :: Parser TypeOrFunDef
+typeOrFunDef = do
+    try typeDef <|> funDef
 
 parser :: Parser Minerva
 parser =
