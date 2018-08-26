@@ -1,0 +1,41 @@
+{-# LANGUAGE OverloadedStrings #-}
+
+module Type where
+import qualified Data.Map as Map
+import qualified Data.Set as Set
+import Data.Text
+import AST
+import Data.Maybe
+
+--data Type = TyConst
+
+--type TypeEnv = Map Text Text
+
+--isTypeDef :: AST -> Bool
+--isTypeDef (TypeDef)
+
+--checkTypeCons :: TypeConstructor -> TypeEnv -> TypeEnv
+--checkTypeCons (TypeConstructor typeCons) =
+
+--checkType :: AST -> TypeEnv -> TypeEnv
+--checkType ast env =
+--    case ast of
+--        TypeDef ref cons ->
+--            if ref `Map.elem` env
+--                then
+--                    error "Already defined " <> ref
+--                else  
+--                    foldr ()
+
+
+getTypeLiteral :: TypeOrFunDef -> Maybe Text
+getTypeLiteral t = 
+    case t of 
+        TypeDef t _ -> Just t
+        _ -> Nothing
+
+addToSet :: Text -> Set.Set Text -> Set.Set Text
+addToSet t s = if Set.member t s then (error "Already defined") else Set.insert t s
+
+getTypeLiterals :: Minerva -> Set.Set Text
+getTypeLiterals = Prelude.foldr addToSet Set.empty . catMaybes . Prelude.map getTypeLiteral

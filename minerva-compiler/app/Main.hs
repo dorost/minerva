@@ -4,6 +4,7 @@ module Main where
 import Data.Text.IO
 import Parser
 import Text.Megaparsec
+import Type
 
 main :: IO ()
 main = do
@@ -15,5 +16,6 @@ main = do
     case parseResult of
         Left err ->
             Prelude.putStrLn ("Error: " <> show err)
-        Right ast ->
+        Right ast -> do
             print ast
+            print (getTypeLiterals ast)

@@ -2,30 +2,11 @@
 
 module Parser where
 
+import AST
 import Data.Text
 import Text.Megaparsec
 import Text.Megaparsec.Char
 
-
-data Expr
-    = App Text Expr
-    | Const Text
-    deriving Show
-
-data FunType
-    = FunType Text [Text]
-    deriving Show
-
-data TypeOrFunDef
-    = TypeDef Text [TypeConstructor]
-    | FunDef Text [FunType] Text Expr
-    deriving Show
-
-type Minerva = [TypeOrFunDef]
-
-data TypeConstructor
-    = TypeConstructor Text
-    deriving Show
 
 type Parser = Parsec () Text
 
