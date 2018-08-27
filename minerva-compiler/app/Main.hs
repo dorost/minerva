@@ -19,3 +19,4 @@ main = do
         Right ast -> do
             print ast
             print (getTypeLiterals ast)
+            print (getTypeConstructors ast)

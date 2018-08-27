@@ -3,7 +3,7 @@
 module Type where
 import qualified Data.Map as Map
 import qualified Data.Set as Set
-import Data.Text
+import Data.Text(Text(..))
 import AST
 import Data.Maybe
 
@@ -34,8 +34,34 @@ getTypeLiteral t =
         TypeDef t _ -> Just t
         _ -> Nothing
 
+getTypeConstructor :: TypeOrFunDef -> Maybe [(Text, Text)]
+getTypeConstructor t = 
+    case t of 
+        TypeDef t ts -> Just (map (\(TypeConstructor x) -> (t,x)) ts)
+        _ -> Nothing
+        
+        
 addToSet :: Text -> Set.Set Text -> Set.Set Text
-addToSet t s = if Set.member t s then (error "Already defined") else Set.insert t s
+addToSet t s = 
+    if Set.member t s
+        then error "Already defined"
+        else Set.insert t s
 
 getTypeLiterals :: Minerva -> Set.Set Text
-getTypeLiterals = Prelude.foldr addToSet Set.empty . catMaybes . Prelude.map getTypeLiteral
+getTypeLiterals = Prelude.foldr addToSet Set.empty . mapMaybe getTypeLiteral
+
+-- TODO parametrized type constructors / higher kinded types
+data Type =
+    TyName Text
+    deriving Show
+
+addToMap :: (Text,  Text) -> Map.Map Text Type -> Map.Map Text Type
+addToMap (ty, tConstr) m = 
+    if Map.member tConstr m
+        then error "Already defined"
+        else Map.insert tConstr (TyName ty) m
+
+getTypeConstructors :: Minerva -> Map.Map Text Type
+getTypeConstructors =
+    Prelude.foldr addToMap Map.empty . concat . mapMaybe getTypeConstructor
+
