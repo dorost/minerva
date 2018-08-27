@@ -41,15 +41,6 @@ getTypeConstructor t =
         _ -> Nothing
         
         
-addToSet :: Text -> Set.Set Text -> Set.Set Text
-addToSet t s = 
-    if Set.member t s
-        then error "Already defined"
-        else Set.insert t s
-
-getTypeLiterals :: Minerva -> Set.Set Text
-getTypeLiterals = Prelude.foldr addToSet Set.empty . mapMaybe getTypeLiteral
-
 -- TODO parametrized type constructors / higher kinded types
 data Type =
     TyName Text

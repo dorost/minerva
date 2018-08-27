@@ -27,6 +27,7 @@ library:
   dependencies:
   - megaparsec
   - text
+  - containers
 
 executables:
   minerva-exe:

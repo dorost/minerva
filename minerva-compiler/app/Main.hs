@@ -18,5 +18,4 @@ main = do
             Prelude.putStrLn ("Error: " <> show err)
         Right ast -> do
             print ast
-            print (getTypeLiterals ast)
             print (getTypeConstructors ast)
