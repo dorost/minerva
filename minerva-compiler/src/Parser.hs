@@ -50,7 +50,8 @@ typeDef = do
 funType :: Parser FunType
 funType = do
     -- TODO
-    return (FunType "" [])
+    typeName <- noSpacing
+    return (FunType typeName)
 
 funDef :: Parser TypeOrFunDef
 funDef = do
@@ -59,14 +60,12 @@ funDef = do
     char ':'
     skipSpacing
     typeArgs <- sepBy funType (string "->")
-    skipSpacing
-    returnType <- noSpacing
     skipSpacing1
     char '='
     skipSpacing1
     exp <- expr
     skipSpacing
-    return (FunDef funName typeArgs returnType exp)
+    return (FunDef funName typeArgs exp)
 
 typeOrFunDef :: Parser TypeOrFunDef
 typeOrFunDef = do

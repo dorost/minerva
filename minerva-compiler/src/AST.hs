@@ -8,12 +8,12 @@ data Expr
     deriving Show
 
 data FunType
-    = FunType Text [Text]
+    = FunType Text
     deriving Show
 
 data TypeOrFunDef
     = TypeDef Text [TypeConstructor]
-    | FunDef Text [FunType] Text Expr
+    | FunDef Text [FunType] Expr
     deriving Show
 
 type Minerva = [TypeOrFunDef]

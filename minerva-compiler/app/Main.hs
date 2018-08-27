@@ -8,7 +8,7 @@ import Type
 
 main :: IO ()
 main = do
-    let fileName = "./examples/bool.mrv"
+    let fileName = "./examples/shouldfail.mrv"
     f <- Data.Text.IO.readFile fileName
     
     let parseResult = runParser parser fileName f
@@ -18,4 +18,6 @@ main = do
             Prelude.putStrLn ("Error: " <> show err)
         Right ast -> do
             print ast
-            print (getTypeConstructors ast)
+            let typeCons = getTypeConstructors ast
+            print (typeCons)
+            print (checkTypes typeCons ast)

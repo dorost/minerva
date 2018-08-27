@@ -11,11 +11,6 @@ import Data.Maybe
 
 --type TypeEnv = Map Text Text
 
---isTypeDef :: AST -> Bool
---isTypeDef (TypeDef)
-
---checkTypeCons :: TypeConstructor -> TypeEnv -> TypeEnv
---checkTypeCons (TypeConstructor typeCons) =
 
 --checkType :: AST -> TypeEnv -> TypeEnv
 --checkType ast env =
@@ -46,6 +41,10 @@ data Type =
     TyName Text
     deriving Show
 
+data Problem =
+    NotEqual Type Type
+    deriving Show
+
 addToMap :: (Text,  Text) -> Map.Map Text Type -> Map.Map Text Type
 addToMap (ty, tConstr) m = 
     if Map.member tConstr m
@@ -56,3 +55,23 @@ getTypeConstructors :: Minerva -> Map.Map Text Type
 getTypeConstructors =
     Prelude.foldr addToMap Map.empty . concat . mapMaybe getTypeConstructor
 
+checkType :: Expr -> Map.Map Text Type -> Type
+checkType (Const t) env =
+    if Map.member t env
+        then fromJust $ Map.lookup t env
+        else error "Const not found"
+checkType _ _ = 
+    error "not supported"
+
+-- check expressions
+-- Todo complex functions / expressions
+checkTypes :: Map.Map Text Type -> Minerva -> Maybe Problem
+checkTypes env (FunDef name (FunType ty: _) expr: ms) =
+    let TyName tyExpr = checkType expr env
+    in
+        if tyExpr /= ty
+            then Just (NotEqual (TyName tyExpr) (TyName ty))
+            else checkTypes env ms
+checkTypes env (_:ms) =
+    checkTypes env ms
+checkTypes env  [] = Nothing
