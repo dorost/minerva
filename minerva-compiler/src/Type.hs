@@ -36,10 +36,6 @@ getTypeConstructor t =
         _ -> Nothing
         
         
--- TODO parametrized type constructors / higher kinded types
-data Type =
-    TyName Text
-    deriving Show
 
 data Problem =
     NotEqual Type Type
@@ -66,11 +62,11 @@ checkType _ _ =
 -- check expressions
 -- Todo complex functions / expressions
 checkTypes :: Map.Map Text Type -> Minerva -> Maybe Problem
-checkTypes env (FunDef name (FunType ty: _) expr: ms) =
-    let TyName tyExpr = checkType expr env
+checkTypes env (FunDef name (ty: _) expr: ms) =
+    let tyExpr = checkType expr env
     in
         if tyExpr /= ty
-            then Just (NotEqual (TyName tyExpr) (TyName ty))
+            then Just (NotEqual tyExpr ty)
             else checkTypes env ms
 checkTypes env (_:ms) =
     checkTypes env ms

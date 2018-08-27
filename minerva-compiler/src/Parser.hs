@@ -47,11 +47,11 @@ typeDef = do
     char '}'
     return (TypeDef typeName typeConstructors)
 
-funType :: Parser FunType
+funType :: Parser Type
 funType = do
     -- TODO
     typeName <- noSpacing
-    return (FunType typeName)
+    return (TyName typeName)
 
 funDef :: Parser TypeOrFunDef
 funDef = do
