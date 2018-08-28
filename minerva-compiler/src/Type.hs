@@ -46,15 +46,24 @@ checkType (Const t) env =
 checkType _ _ = 
     error "not supported"
 
+bindNames :: [Text] -> Type -> Map.Map Text Type -> (Map.Map Text Type, Type)
+bindNames [] rem env = (env, rem)
+bindNames (b: bs) (Type (t: t2: ty)) env =
+    bindNames bs (Type (t2: ty)) (Map.insert b (Type [t]) env)
+bindNames _ _ _ = error "Function has too many variables"
+
+
 -- check expressions
 -- Todo complex functions / expressions
 checkTypes :: Map.Map Text Type -> Minerva -> Maybe Problem
 checkTypes env (FunDecl name bs expr: ms) =
-    let tyExpr = checkType expr env
+    let 
         tyFun = env Map.! name
+        (nEvn, nTyFun) = bindNames bs tyFun env
+        tyExpr = checkType expr nEvn
     in
-        if tyExpr /= tyFun
-            then Just (NotEqual tyExpr tyFun)
+        if tyExpr /= nTyFun
+            then Just (NotEqual tyExpr nTyFun)
             else checkTypes env ms
 checkTypes env (_:ms) =
     checkTypes env ms
