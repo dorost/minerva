@@ -16,11 +16,11 @@ getTypeLiteral t =
         TypeDef t _ -> Just t
         _ -> Nothing
 
-getTypeDef :: TopLevel -> Maybe [(Text, Text)]
+getTypeDef :: TopLevel -> Maybe [(Text, Type)]
 getTypeDef t = 
     case t of 
-        TypeDef t ts -> Just (map (\(TypeConstructor cns) -> (cns, t)) ts)
-        FunDef t ts -> Just (map (\(TyName x) -> (t,x)) ts)
+        TypeDef t ts -> Just (map (\(TypeConstructor cns) -> (cns, Type [t])) ts)
+        FunDef t ts -> Just [(t, ts)]
         _ -> Nothing
         
 
@@ -28,11 +28,11 @@ data Problem =
     NotEqual Type Type
     deriving Show
 
-addToMap :: (Text,  Text) -> Map.Map Text Type -> Map.Map Text Type
-addToMap (ty, tConstr) m = 
-    if Map.member ty m
+addToMap :: (Text,  Type) -> Map.Map Text Type -> Map.Map Text Type
+addToMap (typeRef, ty) m = 
+    if Map.member typeRef m
         then error ("Already defined " <> show ty)
-        else Map.insert ty (TyName tConstr) m
+        else Map.insert typeRef ty m
 
 getTypeDefs :: Minerva -> Map.Map Text Type
 getTypeDefs =
@@ -42,7 +42,7 @@ checkType :: Expr -> Map.Map Text Type -> Type
 checkType (Const t) env =
     if Map.member t env
         then fromJust $ Map.lookup t env
-        else error "Const not found"
+        else error ("Var not found " <> show t)
 checkType _ _ = 
     error "not supported"
 

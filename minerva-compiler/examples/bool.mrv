@@ -11,3 +11,6 @@ true = 1
 
 x : B
 x = false
+
+or : B -> B -> B
+or a b c = a

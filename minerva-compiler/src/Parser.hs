@@ -47,11 +47,12 @@ typeDef = do
     char '}'
     return (TypeDef typeName typeConstructors)
 
-funType :: Parser Type
+funType :: Parser Text
 funType = do
     skipSpacing 
     typeName <- noSpacing
-    return (TyName typeName)
+    skipSpacing
+    return typeName
 
 funDef :: Parser TopLevel
 funDef = do
@@ -60,19 +61,20 @@ funDef = do
     char ':'
     skipSpacing
     typeArgs <- sepBy funType (string "->")
-    skipSpacing1
-    return (FunDef funName typeArgs)
+    skipSpacing
+    return (FunDef funName (Type typeArgs))
 
 funArg :: Parser Text
 funArg = do
-    funArg <- noSpacing
+    funArg <- takeWhile1P Nothing (\c -> c /= ' ' && c /= '\n' && c /= '=')
+    skipSpacing
     return funArg
     
 funDecl :: Parser TopLevel
 funDecl = do
     funName <- noSpacing
-    args <- sepBy funArg (char ' ')
     skipSpacing
+    args <- many funArg
     char '='
     skipSpacing
     e <- expr

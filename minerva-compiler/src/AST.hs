@@ -10,12 +10,12 @@ data Expr
 
 -- TODO parametrized type constructors / higher kinded types
 data Type =
-    TyName Text
+    Type [Text]
     deriving (Show, Eq)
 
 data TopLevel
     = TypeDef Text [TypeConstructor]
-    | FunDef Text [Type]
+    | FunDef Text Type
     | FunDecl Text [Text] Expr
     deriving Show
 
