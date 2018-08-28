@@ -4,6 +4,7 @@ module Type where
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import Data.Text(Text(..))
+import qualified Data.Text as Text
 import AST
 import Data.Maybe
 
@@ -18,7 +19,7 @@ getTypeLiteral t =
 getTypeDef :: TopLevel -> Maybe [(Text, Text)]
 getTypeDef t = 
     case t of 
-        TypeDef t ts -> Just (map (\(TypeConstructor x) -> (t,x)) ts)
+        TypeDef t ts -> Just (map (\(TypeConstructor cns) -> (cns, t)) ts)
         FunDef t ts -> Just (map (\(TyName x) -> (t,x)) ts)
         _ -> Nothing
         
@@ -29,9 +30,9 @@ data Problem =
 
 addToMap :: (Text,  Text) -> Map.Map Text Type -> Map.Map Text Type
 addToMap (ty, tConstr) m = 
-    if Map.member tConstr m
-        then error "Already defined"
-        else Map.insert tConstr (TyName ty) m
+    if Map.member ty m
+        then error ("Already defined " <> show ty)
+        else Map.insert ty (TyName tConstr) m
 
 getTypeDefs :: Minerva -> Map.Map Text Type
 getTypeDefs =

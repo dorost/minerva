@@ -6,4 +6,5 @@ B =
   { 1
   }
 
-fail : A = 1
+fail : A
+fail = 1

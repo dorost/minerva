@@ -71,7 +71,6 @@ funArg = do
 funDecl :: Parser TopLevel
 funDecl = do
     funName <- noSpacing
-    skipSpacing
     args <- sepBy funArg (char ' ')
     skipSpacing
     char '='
@@ -82,7 +81,7 @@ funDecl = do
 
 topLevel :: Parser TopLevel
 topLevel = do
-    try typeDef <|> try funDef <|> try funDecl
+    try typeDef <|> try funDef <|> funDecl
 
 parser :: Parser Minerva
 parser =
