@@ -36,7 +36,7 @@ expr = do
 
     return (Const ref)
 
-typeDef :: Parser TypeOrFunDef
+typeDef :: Parser TopLevel
 typeDef = do
     typeName <- noSpacing
     skipSpacing1
@@ -49,11 +49,11 @@ typeDef = do
 
 funType :: Parser Type
 funType = do
-    -- TODO
+    skipSpacing 
     typeName <- noSpacing
     return (TyName typeName)
 
-funDef :: Parser TypeOrFunDef
+funDef :: Parser TopLevel
 funDef = do
     funName <- noSpacing
     skipSpacing1
@@ -61,16 +61,29 @@ funDef = do
     skipSpacing
     typeArgs <- sepBy funType (string "->")
     skipSpacing1
-    char '='
-    skipSpacing1
-    exp <- expr
-    skipSpacing
-    return (FunDef funName typeArgs exp)
+    return (FunDef funName typeArgs)
 
-typeOrFunDef :: Parser TypeOrFunDef
-typeOrFunDef = do
-    try typeDef <|> funDef
+funArg :: Parser Text
+funArg = do
+    funArg <- noSpacing
+    return funArg
+    
+funDecl :: Parser TopLevel
+funDecl = do
+    funName <- noSpacing
+    skipSpacing
+    args <- sepBy funArg (char ' ')
+    skipSpacing
+    char '='
+    skipSpacing
+    e <- expr
+    skipSpacing
+    return (FunDecl funName args e)
+
+topLevel :: Parser TopLevel
+topLevel = do
+    try typeDef <|> try funDef <|> try funDecl
 
 parser :: Parser Minerva
 parser =
-    typeOrFunDef `sepBy` skipSpacing
+    topLevel `sepBy` skipSpacing

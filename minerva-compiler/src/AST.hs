@@ -13,13 +13,13 @@ data Type =
     TyName Text
     deriving (Show, Eq)
 
-
-data TypeOrFunDef
+data TopLevel
     = TypeDef Text [TypeConstructor]
-    | FunDef Text [Type] Expr
+    | FunDef Text [Type]
+    | FunDecl Text [Text] Expr
     deriving Show
 
-type Minerva = [TypeOrFunDef]
+type Minerva = [TopLevel]
 
 data TypeConstructor
     = TypeConstructor Text

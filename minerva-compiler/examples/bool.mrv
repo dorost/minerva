@@ -3,6 +3,11 @@ B =
   , 1
   }
 
-false : B = 0
+false : B
+false = 0
 
-true : B = 1
+true : B
+true = 1
+
+x : B
+x = false

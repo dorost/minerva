@@ -7,34 +7,20 @@ import Data.Text(Text(..))
 import AST
 import Data.Maybe
 
---data Type = TyConst
-
---type TypeEnv = Map Text Text
 
 
---checkType :: AST -> TypeEnv -> TypeEnv
---checkType ast env =
---    case ast of
---        TypeDef ref cons ->
---            if ref `Map.elem` env
---                then
---                    error "Already defined " <> ref
---                else  
---                    foldr ()
-
-
-getTypeLiteral :: TypeOrFunDef -> Maybe Text
+getTypeLiteral :: TopLevel -> Maybe Text
 getTypeLiteral t = 
     case t of 
         TypeDef t _ -> Just t
         _ -> Nothing
 
-getTypeConstructor :: TypeOrFunDef -> Maybe [(Text, Text)]
-getTypeConstructor t = 
+getTypeDef :: TopLevel -> Maybe [(Text, Text)]
+getTypeDef t = 
     case t of 
         TypeDef t ts -> Just (map (\(TypeConstructor x) -> (t,x)) ts)
+        FunDef t ts -> Just (map (\(TyName x) -> (t,x)) ts)
         _ -> Nothing
-        
         
 
 data Problem =
@@ -47,9 +33,9 @@ addToMap (ty, tConstr) m =
         then error "Already defined"
         else Map.insert tConstr (TyName ty) m
 
-getTypeConstructors :: Minerva -> Map.Map Text Type
-getTypeConstructors =
-    Prelude.foldr addToMap Map.empty . concat . mapMaybe getTypeConstructor
+getTypeDefs :: Minerva -> Map.Map Text Type
+getTypeDefs =
+    Prelude.foldr addToMap Map.empty . concat . mapMaybe getTypeDef
 
 checkType :: Expr -> Map.Map Text Type -> Type
 checkType (Const t) env =
@@ -62,11 +48,12 @@ checkType _ _ =
 -- check expressions
 -- Todo complex functions / expressions
 checkTypes :: Map.Map Text Type -> Minerva -> Maybe Problem
-checkTypes env (FunDef name (ty: _) expr: ms) =
+checkTypes env (FunDecl name bs expr: ms) =
     let tyExpr = checkType expr env
+        tyFun = env Map.! name
     in
-        if tyExpr /= ty
-            then Just (NotEqual tyExpr ty)
+        if tyExpr /= tyFun
+            then Just (NotEqual tyExpr tyFun)
             else checkTypes env ms
 checkTypes env (_:ms) =
     checkTypes env ms
