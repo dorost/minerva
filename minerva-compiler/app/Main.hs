@@ -19,12 +19,16 @@ main = do
         Left err ->
             Prelude.putStrLn ("Error: " <> show err)
         Right ast -> do
-            print ast
             let typeCons = getTypeDefs ast
-            print (typeCons)
-            print (checkTypes typeCons ast)
-            let prog = map getToplevel ast
-            print (prog)
-            --forEver $
-            --    inExpr <- Data.Text.IO.getLine
+            let prog = loadProgram ast
+            print ("minerva loaded")
+            forever $ do
+                inExpr <- Data.Text.IO.getLine
+                let parseResult = runParser expr "eval" inExpr
+                case parseResult of
+                    Left err ->
+                        Prelude.putStrLn ("Error: " <> show err)
+                    Right expr -> do    
+                        print (eval expr prog)
+                return ()
 

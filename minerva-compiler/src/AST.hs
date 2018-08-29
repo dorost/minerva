@@ -5,10 +5,10 @@ import Data.Text
 data Expr
     = App Text Expr
     | Var Text
+    | Tag Text 
     | TypeDef Text [TypeConstructor]
     | FunDef Text Type
     | FunDecl Text [Text] Expr
-
     deriving Show
 
 
