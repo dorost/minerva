@@ -5,6 +5,8 @@ import Data.Text.IO
 import Parser
 import Text.Megaparsec
 import Type
+import Control.Monad
+import Eval
 
 main :: IO ()
 main = do
@@ -21,3 +23,8 @@ main = do
             let typeCons = getTypeDefs ast
             print (typeCons)
             print (checkTypes typeCons ast)
+            let prog = map getToplevel ast
+            print (prog)
+            --forEver $
+            --    inExpr <- Data.Text.IO.getLine
+

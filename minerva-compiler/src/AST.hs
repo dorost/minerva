@@ -4,7 +4,11 @@ import Data.Text
 
 data Expr
     = App Text Expr
-    | Const Text
+    | Var Text
+    | TypeDef Text [TypeConstructor]
+    | FunDef Text Type
+    | FunDecl Text [Text] Expr
+
     deriving Show
 
 
@@ -13,13 +17,7 @@ data Type =
     Type [Text]
     deriving (Show, Eq)
 
-data TopLevel
-    = TypeDef Text [TypeConstructor]
-    | FunDef Text Type
-    | FunDecl Text [Text] Expr
-    deriving Show
-
-type Minerva = [TopLevel]
+type Minerva = [Expr]
 
 data TypeConstructor
     = TypeConstructor Text

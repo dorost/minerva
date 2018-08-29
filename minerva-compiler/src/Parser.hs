@@ -34,9 +34,9 @@ expr :: Parser Expr
 expr = do
     ref <- noSpacing
 
-    return (Const ref)
+    return (Var ref)
 
-typeDef :: Parser TopLevel
+typeDef :: Parser Expr
 typeDef = do
     typeName <- noSpacing
     skipSpacing1
@@ -54,7 +54,7 @@ funType = do
     skipSpacing
     return typeName
 
-funDef :: Parser TopLevel
+funDef :: Parser Expr
 funDef = do
     funName <- noSpacing
     skipSpacing1
@@ -70,7 +70,7 @@ funArg = do
     skipSpacing
     return funArg
     
-funDecl :: Parser TopLevel
+funDecl :: Parser Expr
 funDecl = do
     funName <- noSpacing
     skipSpacing
@@ -81,7 +81,7 @@ funDecl = do
     skipSpacing
     return (FunDecl funName args e)
 
-topLevel :: Parser TopLevel
+topLevel :: Parser Expr
 topLevel = do
     try typeDef <|> try funDef <|> funDecl
 

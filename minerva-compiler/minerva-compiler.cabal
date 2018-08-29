@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 17c7c3f17c368062244a58ed4c3492d5e4171bd599ee3e621c7b08ddd40714b4
+-- hash: 0ed60d4bb398f9f56e67ac0dd7768c262b8902be49c9cf3c6762284fe6804e21
 
 name:           minerva-compiler
 version:        0.1.0.0
@@ -27,6 +27,7 @@ source-repository head
 library
   exposed-modules:
       AST
+      Eval
       Parser
       Type
   other-modules:

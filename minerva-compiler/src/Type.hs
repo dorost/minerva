@@ -10,13 +10,13 @@ import Data.Maybe
 
 
 
-getTypeLiteral :: TopLevel -> Maybe Text
+getTypeLiteral :: Expr -> Maybe Text
 getTypeLiteral t = 
     case t of 
         TypeDef t _ -> Just t
         _ -> Nothing
 
-getTypeDef :: TopLevel -> Maybe [(Text, Type)]
+getTypeDef :: Expr -> Maybe [(Text, Type)]
 getTypeDef t = 
     case t of 
         TypeDef t ts -> Just (map (\(TypeConstructor cns) -> (cns, Type [t])) ts)
@@ -39,7 +39,7 @@ getTypeDefs =
     Prelude.foldr addToMap Map.empty . concat . mapMaybe getTypeDef
 
 checkType :: Expr -> Map.Map Text Type -> Type
-checkType (Const t) env =
+checkType (Var t) env =
     if Map.member t env
         then fromJust $ Map.lookup t env
         else error ("Var not found " <> show t)
