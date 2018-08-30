@@ -30,11 +30,19 @@ typeConstructor = do
     skipSpacing
     return (TypeConstructor instanceName)
 
-expr :: Parser Expr
-expr = do
-    ref <- noSpacing
+expr :: Maybe Expr -> Parser Expr
+expr Nothing = do
+    ref <- takeWhile1P Nothing (\c -> c /= ' ' && c /= '}' )
+    skipSpacing
+    let e = (Var ref)
+    try (expr (Just e)) <|> return e
+expr (Just e) = do
+    skipSpacing
+    ref <- takeWhile1P Nothing (\c -> c /= ' ' && c /= '}' )
+    let app = App e (Var ref)
 
-    return (Var ref)
+    try (expr (Just app)) <|> return app
+
 
 typeDef :: Parser Expr
 typeDef = do
@@ -66,7 +74,7 @@ funDef = do
 
 funArg :: Parser Text
 funArg = do
-    funArg <- takeWhile1P Nothing (\c -> c /= ' ' && c /= '\n' && c /= '=')
+    funArg <- takeWhile1P Nothing (\c -> c /= ' ' && c /= '\n' && c /= '{')
     skipSpacing
     return funArg
     
@@ -75,10 +83,11 @@ funDecl = do
     funName <- noSpacing
     skipSpacing
     args <- many funArg
-    char '='
+    char '{'
     skipSpacing
-    e <- expr
+    e <- expr Nothing
     skipSpacing
+    char '}'
     return (FunDecl funName args e)
 
 topLevel :: Parser Expr

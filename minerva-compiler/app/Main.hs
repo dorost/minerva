@@ -20,15 +20,18 @@ main = do
             Prelude.putStrLn ("Error: " <> show err)
         Right ast -> do
             let typeCons = getTypeDefs ast
+            let typeChecks = checkTypes typeCons ast
+            print typeChecks
             let prog = loadProgram ast
             print ("minerva loaded")
             forever $ do
                 inExpr <- Data.Text.IO.getLine
-                let parseResult = runParser expr "eval" inExpr
+                let parseResult = runParser (expr Nothing) "eval" inExpr
                 case parseResult of
                     Left err ->
                         Prelude.putStrLn ("Error: " <> show err)
-                    Right expr -> do    
-                        print (eval expr prog)
+                    Right e -> do
+                        print e
+                        print (eval e prog)
                 return ()
 

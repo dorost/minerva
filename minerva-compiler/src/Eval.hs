@@ -28,4 +28,6 @@ eval (Var x) env =
     eval (env Map.! x) env
 eval (Tag x) env = 
     Tag x
+eval (App expr expr2) env
+    = error $ "App not implemented"
 eval x _ = error $ "Not supported" <> show x

@@ -43,6 +43,11 @@ checkType (Var t) env =
     if Map.member t env
         then fromJust $ Map.lookup t env
         else error ("Var not found " <> show t)
+checkType (App t1 t2) env =
+    let ty1 = checkType t1 env
+        ty2 = checkType t2 env
+    in
+        error (show ty1 <> "\n" <> show t2)
 checkType _ _ = 
     error "not supported"
 

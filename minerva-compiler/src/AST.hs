@@ -3,7 +3,7 @@ module AST where
 import Data.Text
 
 data Expr
-    = App Text Expr
+    = App Expr Expr
     | Var Text
     | Tag Text 
     | TypeDef Text [TypeConstructor]

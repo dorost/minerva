@@ -4,13 +4,13 @@ B =
   }
 
 false : B
-false = 0
+false { 0 }
 
 true : B
-true = 1
+true { 1 }
 
 x : B
-x = false
+x { false }
 
 or : B -> B -> B
-or a b = b
+or a b { b }
