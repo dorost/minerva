@@ -38,7 +38,10 @@ main = do
                     Right e -> do
                         print e
                         print ()
-                        Data.Text.IO.putStrLn (prettyPrintExpr (eval e prog) <> " : " <> prettyPrintType (checkType e typeDefs))
+                        let x = eval e prog
 
+                        case x of 
+                            Right e2 -> Data.Text.IO.putStrLn (prettyPrintExpr e2 <> " : " <> prettyPrintType (checkType e typeDefs))
+                            Left err -> Data.Text.IO.putStrLn err
                 return ()
 

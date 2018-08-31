@@ -51,9 +51,12 @@ checkType (App t1 t2) env =
         case nTy of
             Just x -> Type x
             Nothing -> error ("xxxx")
-
-checkType _ _ = 
-    error "not supported"
+checkType (Tag t) env =
+    if Map.member t env
+        then fromJust $ Map.lookup t env
+        else error ("Tag not found " <> show t)
+checkType e _ = 
+    error ("not supported" <> show e)
 
 bindNames :: [Text] -> Type -> Map.Map Text Type -> (Map.Map Text Type, Type)
 bindNames [] rem env = (env, rem)

@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Eval where
 
 import qualified Data.Map as Map
@@ -23,21 +25,21 @@ getTopLevel _ = Nothing
 loadProgram :: [Expr] -> Map.Map Text Expr
 loadProgram = Map.fromList . Prelude.concat . mapMaybe getToplevel
 
-eval :: Expr -> Map.Map Text Expr -> Expr
-eval (Var x) env = 
-    eval (env Map.! x) env
-eval (Tag x) env = 
-    Tag x
+eval :: Expr -> Map.Map Text Expr -> Either Text Expr
+eval (Var x) env = do
+    maybe (Left ("Var not found: " <> x)) (\e -> eval e env) (Map.lookup x env)
+eval (Tag x) env = do
+    return $ Tag x
 eval (FunDecl _ [] e2) env = eval e2 env
-eval (FunDecl name bs e2) env = FunDecl name bs e2
-eval (App expr1 e2) env =
-    case eval expr1 env of
+eval (FunDecl name bs e2) env = return $ FunDecl name bs e2
+eval (App expr1 e2) env = do
+    e1 <- eval expr1 env
+    case e1 of
         FunDecl name (b:bs) expr ->
             let nEnv = Map.insert b e2 env
             in
                 eval (FunDecl name bs expr) nEnv
         _ ->
-            error "Could not be applied"
-        
+            Left "Could not be applied"
 
-eval x _ = error $ "Not supported" <> show x
+eval x _ = Left ("Not supported" <> pack (show x))
