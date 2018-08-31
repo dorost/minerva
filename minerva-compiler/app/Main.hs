@@ -1,12 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main where
+import Data.Text
 import Data.Text.IO
 import Parser
 import Text.Megaparsec
 import Type
 import Control.Monad
 import Eval
+import AST
+
 
 main :: IO ()
 main = do
@@ -34,6 +37,8 @@ main = do
                         Prelude.putStrLn ("Error: " <> show err)
                     Right e -> do
                         print e
-                        print (eval e prog)
+                        print ()
+                        Data.Text.IO.putStrLn (prettyPrintExpr (eval e prog) <> " : " <> prettyPrintType (checkType e typeDefs))
+
                 return ()
 
