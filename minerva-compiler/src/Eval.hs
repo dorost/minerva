@@ -28,6 +28,16 @@ eval (Var x) env =
     eval (env Map.! x) env
 eval (Tag x) env = 
     Tag x
-eval (App expr expr2) env
-    = error $ "App not implemented"
+eval (FunDecl _ [] e2) env = eval e2 env
+eval (FunDecl name bs e2) env = FunDecl name bs e2
+eval (App expr1 e2) env =
+    case eval expr1 env of
+        FunDecl name (b:bs) expr ->
+            let nEnv = Map.insert b e2 env
+            in
+                eval (FunDecl name bs expr) nEnv
+        _ ->
+            error "Could not be applied"
+        
+
 eval x _ = error $ "Not supported" <> show x

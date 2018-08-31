@@ -14,3 +14,6 @@ x { false }
 
 or : B -> B -> B
 or a b { b }
+
+rr : B
+rr { or 0 1}

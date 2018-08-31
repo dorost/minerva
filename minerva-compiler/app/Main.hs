@@ -19,8 +19,10 @@ main = do
         Left err ->
             Prelude.putStrLn ("Error: " <> show err)
         Right ast -> do
-            let typeCons = getTypeDefs ast
-            let typeChecks = checkTypes typeCons ast
+            print ast
+            let typeDefs = getTypeDefs ast
+            print typeDefs
+            let typeChecks = checkTypes typeDefs ast
             print typeChecks
             let prog = loadProgram ast
             print ("minerva loaded")

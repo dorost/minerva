@@ -7,7 +7,7 @@ import Data.Text(Text(..))
 import qualified Data.Text as Text
 import AST
 import Data.Maybe
-
+import Data.List
 
 
 getTypeLiteral :: Expr -> Maybe Text
@@ -31,7 +31,7 @@ data Problem =
 addToMap :: (Text,  Type) -> Map.Map Text Type -> Map.Map Text Type
 addToMap (typeRef, ty) m = 
     if Map.member typeRef m
-        then error ("Already defined " <> show ty)
+        then error ("Already defined " <> show typeRef)
         else Map.insert typeRef ty m
 
 getTypeDefs :: Minerva -> Map.Map Text Type
@@ -44,10 +44,14 @@ checkType (Var t) env =
         then fromJust $ Map.lookup t env
         else error ("Var not found " <> show t)
 checkType (App t1 t2) env =
-    let ty1 = checkType t1 env
-        ty2 = checkType t2 env
+    let Type ty1 = checkType t1 env
+        Type ty2 = checkType t2 env
+        nTy = stripPrefix ty2 ty1
     in
-        error (show ty1 <> "\n" <> show t2)
+        case nTy of
+            Just x -> Type x
+            Nothing -> error ("xxxx")
+
 checkType _ _ = 
     error "not supported"
 
@@ -62,10 +66,13 @@ bindNames _ _ _ = error "Function has too many variables"
 -- Todo complex functions / expressions
 checkTypes :: Map.Map Text Type -> Minerva -> Maybe Problem
 checkTypes env (FunDecl name bs expr: ms) =
-    let 
-        tyFun = env Map.! name
-        (nEvn, nTyFun) = bindNames bs tyFun env
-        tyExpr = checkType expr nEvn
+        let 
+            tyFun =
+                case Map.lookup name env of 
+                    Just x -> x
+                    Nothing -> error (show name)
+            (nEvn, nTyFun) = bindNames bs tyFun env
+            tyExpr = checkType expr nEvn
     in
         if tyExpr /= nTyFun
             then Just (NotEqual tyExpr nTyFun)

@@ -8,6 +8,8 @@ data Expr
     | Tag Text 
     | TypeDef Text [TypeConstructor]
     | FunDef Text Type
+    | Lam Text Expr
+    | Let Text Expr
     | FunDecl Text [Text] Expr
     deriving Show
 
