@@ -62,6 +62,11 @@ funType = do
     skipSpacing
     return typeName
 
+fromBasic :: [Text] -> Type
+fromBasic [] = error "fromBasic: unexpected"
+fromBasic [x] = Basic x
+fromBasic (x:xs) = To (Basic x) (fromBasic xs)
+
 funDef :: Parser Expr
 funDef = do
     funName <- noSpacing
@@ -70,7 +75,7 @@ funDef = do
     skipSpacing
     typeArgs <- sepBy funType (string "->")
     skipSpacing
-    return (FunDef funName (Type typeArgs))
+    return (FunDef funName (fromBasic typeArgs))
 
 funArg :: Parser Text
 funArg = do

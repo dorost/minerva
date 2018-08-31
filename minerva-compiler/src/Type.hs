@@ -19,10 +19,9 @@ getTypeLiteral t =
 getTypeDef :: Expr -> Maybe [(Text, Type)]
 getTypeDef t = 
     case t of 
-        TypeDef t ts -> Just (map (\(TypeConstructor cns) -> (cns, Type [t])) ts)
+        TypeDef t ts -> Just (map (\(TypeConstructor cns) -> (cns, Basic t)) ts)
         FunDef t ts -> Just [(t, ts)]
         _ -> Nothing
-        
 
 data Problem =
     NotEqual Type Type
@@ -38,19 +37,25 @@ getTypeDefs :: Minerva -> Map.Map Text Type
 getTypeDefs =
     Prelude.foldr addToMap Map.empty . concat . mapMaybe getTypeDef
 
+stripApp :: Type -> Type -> Maybe Type
+stripApp (To x@(Basic t1) t2) y@(Basic t3) =
+    if x == y then (Just t2) else Nothing
+stripApp _ _ =
+    Nothing
+
 checkType :: Expr -> Map.Map Text Type -> Type
 checkType (Var t) env =
     if Map.member t env
         then fromJust $ Map.lookup t env
         else error ("Var not found " <> show t)
 checkType (App t1 t2) env =
-    let Type ty1 = checkType t1 env
-        Type ty2 = checkType t2 env
-        nTy = stripPrefix ty2 ty1
+    let ty1 = checkType t1 env
+        ty2 = checkType t2 env
+        nTy = stripApp ty1 ty2
     in
         case nTy of
-            Just x -> Type x
-            Nothing -> error ("xxxx")
+            Just x -> x
+            Nothing -> error ("unexpected: checkType" <> show ty1 <> show ty2)
 checkType (Tag t) env =
     if Map.member t env
         then fromJust $ Map.lookup t env
@@ -60,8 +65,8 @@ checkType e _ =
 
 bindNames :: [Text] -> Type -> Map.Map Text Type -> (Map.Map Text Type, Type)
 bindNames [] rem env = (env, rem)
-bindNames (b: bs) (Type (t: t2: ty)) env =
-    bindNames bs (Type (t2: ty)) (Map.insert b (Type [t]) env)
+bindNames (b: bs) (To t t2) env =
+    bindNames bs t2 (Map.insert b t env)
 bindNames _ _ _ = error "Function has too many variables"
 
 
