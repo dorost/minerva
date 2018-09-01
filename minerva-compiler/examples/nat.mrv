@@ -1,0 +1,10 @@
+N = { Zero : N
+    , Succ : N -> N
+    }
+
+
+zero : N
+zero { Zero }
+
+succ : N -> N
+succ { Succ }
