@@ -45,9 +45,7 @@ stripApp _ _ =
 
 checkType :: Expr -> Map.Map Text Type -> Type
 checkType (Var t) env =
-    if Map.member t env
-        then fromJust $ Map.lookup t env
-        else error ("Var not found " <> show t)
+    fromMaybe (error ("Var not found " <> show t)) (Map.lookup t env)
 checkType (App t1 t2) env =
     let ty1 = checkType t1 env
         ty2 = checkType t2 env
@@ -55,9 +53,7 @@ checkType (App t1 t2) env =
     in
         fromMaybe (error ("unexpected: checkType" <> show ty1 <> show ty2)) nTy
 checkType (Tag t) env =
-    if Map.member t env
-        then fromJust $ Map.lookup t env
-        else error ("Tag not found " <> show t)
+    fromMaybe (error ("Tag not found " <> show t)) (Map.lookup t env)
 checkType e _ = 
     error ("not supported" <> show e)
 

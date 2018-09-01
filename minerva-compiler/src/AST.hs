@@ -16,7 +16,7 @@ data Expr
     deriving Show
 
 prettyPrintExpr :: Expr -> Text
-prettyPrintExpr (Tag x) = x 
+prettyPrintExpr (Tag x) = x
 prettyPrintExpr e = pack (show e)
 -- TODO parametrized type constructors / higher kinded types
 data Type 
