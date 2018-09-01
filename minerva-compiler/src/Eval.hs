@@ -8,7 +8,7 @@ import AST
 import Data.Maybe
 
 getToplevelConstructors :: TypeConstructor -> (Text, Expr)
-getToplevelConstructors (TypeConstructor tConst) =
+getToplevelConstructors (TypeConstructor tConst _) =
     (tConst, Tag tConst)
 
 getToplevel :: Expr -> Maybe [(Text, Expr)]

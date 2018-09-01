@@ -18,7 +18,7 @@ data Expr
 prettyPrintExpr :: Expr -> Text
 prettyPrintExpr (Tag x) = x
 prettyPrintExpr e = pack (show e)
--- TODO parametrized type constructors / higher kinded types
+
 data Type 
     = Basic Text
     | To Type Type
@@ -33,5 +33,5 @@ prettyPrintType (To t u) =
 type Minerva = [Expr]
 
 data TypeConstructor
-    = TypeConstructor Text
+    = TypeConstructor Text Type
     deriving Show

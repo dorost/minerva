@@ -28,7 +28,11 @@ typeConstructor = do
     skipSpacing
     instanceName <- noSpacing
     skipSpacing
-    return (TypeConstructor instanceName)
+    char ':'
+    skipSpacing
+    ts <- typeArgs
+    skipSpacing
+    return (TypeConstructor instanceName ts)
 
 expr :: Maybe Expr -> Parser Expr
 expr Nothing = do

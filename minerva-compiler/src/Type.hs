@@ -16,10 +16,19 @@ getTypeLiteral t =
         TypeDef t _ -> Just t
         _ -> Nothing
 
+getLast :: Type -> Text
+getLast (Basic x) = x
+getLast (To t u) = getLast u
+
 getTypeDef :: Expr -> Maybe [(Text, Type)]
 getTypeDef t = 
     case t of 
-        TypeDef t ts -> Just (map (\(TypeConstructor cns) -> (cns, Basic t)) ts)
+        TypeDef t ts ->
+                Just (map (\(TypeConstructor cns u) ->     
+                    if t == getLast u
+                        then (cns, u)
+                        else error (show $ "Last argument of type constructor should be of type" <> t)
+                    ) ts)
         FunDef t ts -> Just [(t, ts)]
         _ -> Nothing
 

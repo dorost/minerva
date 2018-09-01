@@ -2,4 +2,4 @@
 
 
 makeUnit : ()
-makeUnit = ()
+makeUnit { () }
