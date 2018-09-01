@@ -17,3 +17,7 @@ or a b { b }
 
 rr : B
 rr { or 0 1}
+
+nontrivial : ( B -> B ) -> ( B -> B )
+nontrivial a { a }
+

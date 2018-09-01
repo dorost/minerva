@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main where
+import Prelude hiding (putStrLn)
 import Data.Text
 import Data.Text.IO
 import Parser
@@ -9,7 +10,6 @@ import Type
 import Control.Monad
 import Eval
 import AST
-
 
 main :: IO ()
 main = do
@@ -20,7 +20,7 @@ main = do
 
     case parseResult of
         Left err ->
-            Prelude.putStrLn ("Error: " <> show err)
+            putStrLn ("Error: " <> pack (show err))
         Right ast -> do
             print ast
             let typeDefs = getTypeDefs ast
@@ -28,20 +28,20 @@ main = do
             let typeChecks = checkTypes typeDefs ast
             print typeChecks
             let prog = loadProgram ast
-            print ("minerva loaded")
+            putStrLn "minerva loaded"
             forever $ do
                 inExpr <- Data.Text.IO.getLine
                 let parseResult = runParser (expr Nothing) "eval" inExpr
                 case parseResult of
                     Left err ->
-                        Prelude.putStrLn ("Error: " <> show err)
+                        putStrLn ("Error: " <> pack (show err))
                     Right e -> do
                         print e
                         print ()
                         let x = eval e prog
 
                         case x of 
-                            Right e2 -> Data.Text.IO.putStrLn (prettyPrintExpr e2 <> " : " <> prettyPrintType (checkType e typeDefs))
-                            Left err -> Data.Text.IO.putStrLn err
+                            Right e2 -> putStrLn (prettyPrintExpr e2 <> " : " <> prettyPrintType (checkType e typeDefs))
+                            Left err -> putStrLn err
                 return ()
 

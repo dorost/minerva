@@ -26,10 +26,10 @@ loadProgram :: [Expr] -> Map.Map Text Expr
 loadProgram = Map.fromList . Prelude.concat . mapMaybe getToplevel
 
 eval :: Expr -> Map.Map Text Expr -> Either Text Expr
-eval (Var x) env = do
+eval (Var x) env =
     maybe (Left ("Var not found: " <> x)) (\e -> eval e env) (Map.lookup x env)
-eval (Tag x) env = do
-    return $ Tag x
+eval (Tag x) env =
+    return (Tag x)
 eval (FunDecl _ [] e2) env = eval e2 env
 eval (FunDecl name bs e2) env = return $ FunDecl name bs e2
 eval (App expr1 e2) env = do

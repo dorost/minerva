@@ -39,7 +39,7 @@ getTypeDefs =
 
 stripApp :: Type -> Type -> Maybe Type
 stripApp (To x@(Basic t1) t2) y@(Basic t3) =
-    if x == y then (Just t2) else Nothing
+    if x == y then Just t2 else Nothing
 stripApp _ _ =
     Nothing
 
@@ -53,9 +53,7 @@ checkType (App t1 t2) env =
         ty2 = checkType t2 env
         nTy = stripApp ty1 ty2
     in
-        case nTy of
-            Just x -> x
-            Nothing -> error ("unexpected: checkType" <> show ty1 <> show ty2)
+        fromMaybe (error ("unexpected: checkType" <> show ty1 <> show ty2)) nTy
 checkType (Tag t) env =
     if Map.member t env
         then fromJust $ Map.lookup t env
@@ -76,9 +74,7 @@ checkTypes :: Map.Map Text Type -> Minerva -> Maybe Problem
 checkTypes env (FunDecl name bs expr: ms) =
         let 
             tyFun =
-                case Map.lookup name env of 
-                    Just x -> x
-                    Nothing -> error (show name)
+                fromMaybe (error (show name)) (Map.lookup name env)
             (nEvn, nTyFun) = bindNames bs tyFun env
             tyExpr = checkType expr nEvn
     in

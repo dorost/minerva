@@ -21,7 +21,7 @@ skipSpacing1 =
 noSpacing :: Parser Text
 noSpacing =
     takeWhile1P Nothing (\c -> c /= ' ' && c /= '\n')
-
+    
 typeConstructor :: Parser TypeConstructor
 typeConstructor = do
     -- TODO add type definitions / type application
@@ -34,7 +34,7 @@ expr :: Maybe Expr -> Parser Expr
 expr Nothing = do
     ref <- takeWhile1P Nothing (\c -> c /= ' ' && c /= '}' )
     skipSpacing
-    let e = (Var ref)
+    let e = Var ref
     try (expr (Just e)) <|> return e
 expr (Just e) = do
     skipSpacing
@@ -62,20 +62,24 @@ funType = do
     skipSpacing
     return typeName
 
-fromBasic :: [Text] -> Type
-fromBasic [] = error "fromBasic: unexpected"
-fromBasic [x] = Basic x
-fromBasic (x:xs) = To (Basic x) (fromBasic xs)
-
+typeArgs :: Parser Type
+typeArgs = do
+    skipSpacing
+    t <- try (char '(' *> typeArgs <* char ')' )
+         <|> Basic <$> funType
+    skipSpacing
+    To t <$> try (string "->" *> typeArgs)
+         <|> return t
+    
 funDef :: Parser Expr
 funDef = do
     funName <- noSpacing
     skipSpacing1
     char ':'
     skipSpacing
-    typeArgs <- sepBy funType (string "->")
+    targs <- typeArgs
     skipSpacing
-    return (FunDef funName (fromBasic typeArgs))
+    return (FunDef funName targs)
 
 funArg :: Parser Text
 funArg = do
@@ -93,10 +97,11 @@ funDecl = do
     e <- expr Nothing
     skipSpacing
     char '}'
+    skipSpacing
     return (FunDecl funName args e)
 
 topLevel :: Parser Expr
-topLevel = do
+topLevel =
     try typeDef <|> try funDef <|> funDecl
 
 parser :: Parser Minerva
