@@ -2,9 +2,16 @@ N = { Zero : N
     , Succ : N -> N
     }
 
+X = { A : N -> N -> N -> N -> X }
 
 zero : N
 zero { Zero }
+
+one : N
+one { Succ zero }
+
+two : N
+two { Succ one }
 
 succ : N -> N
 succ { Succ }

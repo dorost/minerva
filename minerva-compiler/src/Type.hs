@@ -61,7 +61,7 @@ checkType (App t1 t2) env =
         nTy = stripApp ty1 ty2
     in
         fromMaybe (error ("unexpected: checkType" <> show ty1 <> show ty2)) nTy
-checkType (Tag t) env =
+checkType (Tag t _) env =
     fromMaybe (error ("Tag not found " <> show t)) (Map.lookup t env)
 checkType e _ = 
     error ("not supported" <> show e)

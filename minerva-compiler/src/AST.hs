@@ -7,7 +7,7 @@ import Data.Text
 data Expr
     = App Expr Expr
     | Var Text
-    | Tag Text 
+    | Tag Text [Expr]
     | TypeDef Text [TypeConstructor]
     | FunDef Text Type
     | Lam Text Expr
@@ -16,7 +16,8 @@ data Expr
     deriving Show
 
 prettyPrintExpr :: Expr -> Text
-prettyPrintExpr (Tag x) = x
+prettyPrintExpr (Tag x []) = x
+prettyPrintExpr (Tag x xs) = x <> " (" <> Data.Text.intercalate ") (" (Prelude.map prettyPrintExpr (Prelude.reverse xs)) <> ")"
 prettyPrintExpr e = pack (show e)
 
 data Type 
