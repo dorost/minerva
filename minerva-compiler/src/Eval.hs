@@ -32,7 +32,7 @@ eval (Var x) env =
 eval (Tag x es) env =
     case (partitionEithers $ Prelude.map (`eval` env) es) of
         ([], esn) -> Right (Tag x esn)
-        (e, _) -> Left "Something occured in evaluating data type"
+        (e:es, _) -> Left e
 eval (FunDecl _ [] e2) env = eval e2 env
 eval (FunDecl name bs e2) env = return $ FunDecl name bs e2
 eval (App expr1 e2) env = do
