@@ -16,7 +16,7 @@ succ { Succ }
 
 add : N -> N -> N
 add a b { case a
-    { Zero => Zero
-    | Succ x => Succ x
+    { Zero => b
+    | Succ c => Succ (add c b)
     }
 }

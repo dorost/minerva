@@ -66,16 +66,30 @@ pattern = do
     skipSpacing
     return (Pattern instanceName args)
 
+ident :: Parser Text
+ident = takeWhile1P Nothing (\c -> 
+    c /= ' ' &&
+    c /= '}' &&
+    c /= '|' &&
+    c /= '=' && 
+    c /= '{' && 
+    c /= '\n' &&
+    c/= '(' &&
+    c/= ')'
+    )
+
 expr :: Maybe Expr -> Parser Expr
 expr Nothing = do
-    ref <- takeWhile1P Nothing (\c -> c /= ' ' && c /= '}' && c /= '|' && c /= '=' && c /= '{' && c/= '\n')
     skipSpacing
-    let e = Var ref
+    e <-  try (char '(' *> skipSpacing *> expr Nothing <* skipSpacing <* char ')')
+            <|> Var <$> ident
+    skipSpacing
     try (expr (Just e)) <|> return e
 expr (Just e) = do
     skipSpacing
-    ref <- takeWhile1P Nothing (\c -> c /= ' ' && c /= '}' && c /= '|' && c /= '=' && c /= '{' && c/= '\n')
-    let app = App e (Var ref)
+    e2 <- try (char '(' *> skipSpacing *> expr Nothing <* skipSpacing <* char ')')
+         <|> Var <$> ident
+    let app = App e e2
 
     try (expr (Just app)) <|> return app
 
