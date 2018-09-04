@@ -34,15 +34,47 @@ typeConstructor = do
     skipSpacing
     return (TypeConstructor instanceName ts)
 
+matchExpr :: Parser Expr
+matchExpr = do
+    string "case"
+    skipSpacing
+    e1 <- expr Nothing
+    skipSpacing
+    char '{'
+    patterns <- sepBy patternExpr "|"
+    skipSpacing
+    char '}'
+    skipSpacing
+    return (Match e1 patterns)
+
+
+patternExpr :: Parser (Pattern, Expr)
+patternExpr = do
+    p <- pattern
+    string "=>"
+    skipSpacing
+    e <- expr Nothing
+    skipSpacing
+    return (p, e)
+
+pattern ::  Parser Pattern
+pattern = do
+    skipSpacing
+    instanceName <- noSpacing
+    skipSpacing
+    args <- many arg
+    skipSpacing
+    return (Pattern instanceName args)
+
 expr :: Maybe Expr -> Parser Expr
 expr Nothing = do
-    ref <- takeWhile1P Nothing (\c -> c /= ' ' && c /= '}' )
+    ref <- takeWhile1P Nothing (\c -> c /= ' ' && c /= '}' && c /= '|' && c /= '=' && c /= '{' && c/= '\n')
     skipSpacing
     let e = Var ref
     try (expr (Just e)) <|> return e
 expr (Just e) = do
     skipSpacing
-    ref <- takeWhile1P Nothing (\c -> c /= ' ' && c /= '}' )
+    ref <- takeWhile1P Nothing (\c -> c /= ' ' && c /= '}' && c /= '|' && c /= '=' && c /= '{' && c/= '\n')
     let app = App e (Var ref)
 
     try (expr (Just app)) <|> return app
@@ -52,10 +84,8 @@ typeDef :: Parser Expr
 typeDef = do
     typeName <- noSpacing
     skipSpacing1
-    string "="
-    skipSpacing1
     char '{'
-    typeConstructors <- typeConstructor `sepBy` char ','
+    typeConstructors <- typeConstructor `sepBy` char '|'
     char '}'
     return (TypeDef typeName typeConstructors)
 
@@ -85,20 +115,20 @@ funDef = do
     skipSpacing
     return (FunDef funName targs)
 
-funArg :: Parser Text
-funArg = do
-    funArg <- takeWhile1P Nothing (\c -> c /= ' ' && c /= '\n' && c /= '{')
+arg :: Parser Text
+arg = do
+    argName <- takeWhile1P Nothing (\c -> c /= ' ' && c /= '\n' && c /= '{' && c /= '=')
     skipSpacing
-    return funArg
+    return argName
     
 funDecl :: Parser Expr
 funDecl = do
     funName <- noSpacing
     skipSpacing
-    args <- many funArg
+    args <- many arg
     char '{'
     skipSpacing
-    e <- expr Nothing
+    e <- matchExpr <|> expr Nothing
     skipSpacing
     char '}'
     skipSpacing

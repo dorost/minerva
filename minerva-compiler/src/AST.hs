@@ -8,11 +8,18 @@ data Expr
     = App Expr Expr
     | Var Text
     | Tag Text [Expr]
-    | TypeDef Text [TypeConstructor]
-    | FunDef Text Type
     | Lam Text Expr
     | Let Text Expr
+    | Match Expr [(Pattern, Expr)]
+    -- Definitions
+    | TypeDef Text [TypeConstructor]
+    | FunDef Text Type
     | FunDecl Text [Text] Expr
+    deriving Show
+
+data Pattern =
+    -- Tag + bindings
+    Pattern Text [Text]
     deriving Show
 
 prettyPrintExpr :: Expr -> Text

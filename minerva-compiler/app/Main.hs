@@ -41,7 +41,7 @@ main = do
                         let x = eval e prog
 
                         case x of 
-                            Right e2 -> putStrLn (prettyPrintExpr e2 <> " : " <> prettyPrintType (checkType e typeDefs))
+                            Right (e2,_) -> putStrLn (prettyPrintExpr e2 <> " : " <> prettyPrintType (checkType e typeDefs))
                             Left err -> putStrLn err
                 return ()
 

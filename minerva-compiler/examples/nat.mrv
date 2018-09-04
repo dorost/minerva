@@ -1,8 +1,6 @@
-N = { Zero : N
-    , Succ : N -> N
-    }
-
-X = { A : N -> N -> N -> N -> X }
+N { Zero : N
+  | Succ : N -> N
+  }
 
 zero : N
 zero { Zero }
@@ -15,3 +13,10 @@ two { Succ one }
 
 succ : N -> N
 succ { Succ }
+
+add : N -> N -> N
+add a b { case a
+    { Zero => Zero
+    | Succ x => Succ x
+    }
+}

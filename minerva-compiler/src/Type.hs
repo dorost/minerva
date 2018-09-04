@@ -52,6 +52,13 @@ stripApp (To x@(Basic t1) t2) y@(Basic t3) =
 stripApp _ _ =
     Nothing
 
+checkPattern :: (Pattern, Expr) -> Map.Map Text Type -> (Type, Type)
+checkPattern (Pattern t bs, expr) env =
+    let tPattern = env Map.! t
+        (nEnv,pTy) = bindNames bs tPattern env
+    in
+        (pTy, checkType expr nEnv)
+
 checkType :: Expr -> Map.Map Text Type -> Type
 checkType (Var t) env =
     fromMaybe (error ("Var not found " <> show t)) (Map.lookup t env)
@@ -63,6 +70,18 @@ checkType (App t1 t2) env =
         fromMaybe (error ("unexpected: checkType" <> show ty1 <> show ty2)) nTy
 checkType (Tag t _) env =
     fromMaybe (error ("Tag not found " <> show t)) (Map.lookup t env)
+checkType (Match e ps) env =
+    let ty1 = checkType e env
+        (ty:tys) = map (\p -> checkPattern p env) ps
+    in
+        if any (/=snd ty) (map snd tys) then error "All expressions in match should be equal"
+        else
+        if
+           any (/=ty1) (map fst tys) then error "All Patterns should be of correct type"
+        else
+            snd ty
+        
+
 checkType e _ = 
     error ("not supported" <> show e)
 
