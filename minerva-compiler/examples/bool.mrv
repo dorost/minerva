@@ -12,11 +12,15 @@ x : B
 x { false }
 
 or : B -> B -> B
-or a b { b }
+or a b { case a
+ { 1 => 1
+ | 0 => b
+ }
+}
 
-rr : B
-rr { or 0 1}
-
-nontrivial : ( B -> B ) -> ( B -> B )
-nontrivial a { a }
-
+and : B -> B -> B
+and a b { case a 
+ { 1 => b
+ | 0 => 0
+ }
+}
