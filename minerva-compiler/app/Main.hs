@@ -23,7 +23,9 @@ main = do
             putStrLn ("Error: " <> pack (show err))
         Right ast -> do
             print ast
+            let typeDefs' = getTypeDefs' ast
             let typeDefs = getTypeDefs ast
+            print typeDefs'
             print typeDefs
             let typeChecks = checkTypes typeDefs ast
             print typeChecks

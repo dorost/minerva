@@ -8,7 +8,7 @@ import qualified Data.Text as Text
 import AST
 import Data.Maybe
 import Data.List
-
+import Inference
 
 getTypeLiteral :: Expr -> Maybe Text
 getTypeLiteral t = 
@@ -18,7 +18,7 @@ getTypeLiteral t =
 
 getLast :: Type -> Text
 getLast (Basic x) = x
-getLast (To t u) = getLast u
+getLast (TFun t1 t2) = getLast t2
 
 getTypeDef :: Expr -> Maybe [(Text, Type)]
 getTypeDef t = 
@@ -46,8 +46,19 @@ getTypeDefs :: Minerva -> Map.Map Text Type
 getTypeDefs =
     Prelude.foldr addToMap Map.empty . concat . mapMaybe getTypeDef
 
+addToMap' :: (Text,  Type) -> Map.Map Text Scheme -> Map.Map Text Scheme
+addToMap' (typeRef, ty) m = 
+    if Map.member typeRef m
+        then error ("Already defined " <> show typeRef)
+        else Map.insert typeRef (Scheme [] ty) m
+    
+getTypeDefs' :: Minerva -> Map.Map Text.Text Scheme
+getTypeDefs' =
+    Prelude.foldr addToMap' Map.empty . concat . mapMaybe getTypeDef
+    
+
 stripApp :: Type -> Type -> Maybe Type
-stripApp (To x@(Basic t1) t2) y@(Basic t3) =
+stripApp (TFun x@(Basic t1) t2) y@(Basic t3) =
     if x == y then Just t2 else Nothing
 stripApp _ _ =
     Nothing
@@ -79,16 +90,16 @@ checkType (Match e ps) env =
         if
            any (/=ty1) (map fst tys) then error "All Patterns should be of correct type"
         else
-            snd ty
-        
-
+            snd ty    
+checkType Hole env =
+    error "Hole supported yet"
 checkType e _ = 
-    error ("not supported" <> show e)
+    error ("not supported:" <> show e)
 
 bindNames :: [Text] -> Type -> Map.Map Text Type -> (Map.Map Text Type, Type)
 bindNames [] rem env = (env, rem)
-bindNames (b: bs) (To t t2) env =
-    bindNames bs t2 (Map.insert b t env)
+bindNames (b: bs) (TFun t1 t2) env =
+    bindNames bs t2 (Map.insert b t1 env)
 bindNames _ _ _ = error "Function has too many variables"
 
 
@@ -104,7 +115,7 @@ checkTypes env (FunDecl name bs expr: ms) =
     in
         if tyExpr /= nTyFun
             then Just (NotEqual tyExpr nTyFun)
-            else checkTypes env ms
+            else checkTypes env ms        
 checkTypes env (_:ms) =
     checkTypes env ms
 checkTypes env  [] = Nothing

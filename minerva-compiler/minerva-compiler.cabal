@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0ed60d4bb398f9f56e67ac0dd7768c262b8902be49c9cf3c6762284fe6804e21
+-- hash: 824fd8fed2bba6d16de6c27ff1e0b7c24a89517215bfefcc89cb7ba335a8f745
 
 name:           minerva-compiler
 version:        0.1.0.0
@@ -28,6 +28,7 @@ library
   exposed-modules:
       AST
       Eval
+      Inference
       Parser
       Type
   other-modules:
@@ -38,6 +39,7 @@ library
       base >=4.7 && <5
     , containers
     , megaparsec
+    , mtl
     , text
   default-language: Haskell2010
 

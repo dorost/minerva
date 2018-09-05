@@ -28,6 +28,7 @@ library:
   - megaparsec
   - text
   - containers
+  - mtl
 
 executables:
   minerva-exe:

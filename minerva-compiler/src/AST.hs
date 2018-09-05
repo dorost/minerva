@@ -9,13 +9,24 @@ data Expr
     | Var Text
     | Tag Text [Expr]
     | Lam Text Expr
-    | Let Text Expr
+    | Bind Text Expr
     | Match Expr [(Pattern, Expr)]
+    | Hole
     -- Definitions
     | TypeDef Text [TypeConstructor]
     | FunDef Text Type
     | FunDecl Text [Text] Expr
     deriving Show
+
+
+toLambda :: [Text] -> Expr -> Expr
+toLambda [] e = e
+toLambda (a:args) e = Lam a (toLambda args e)
+
+defToLambda :: Expr -> Expr
+defToLambda (FunDecl funId args e) =
+    Bind funId (toLambda args e)
+defToLambda e = e
 
 data Pattern =
     -- Tag + bindings
@@ -29,13 +40,14 @@ prettyPrintExpr e = pack (show e)
 
 data Type 
     = Basic Text
-    | To Type Type
+    | TFun Type Type
+    | TVar Text
     deriving (Show, Eq)
 
 prettyPrintType :: Type -> Text
 prettyPrintType (Basic t) =
     t
-prettyPrintType (To t u) =
+prettyPrintType (TFun t u) =
     prettyPrintType t <> " -> " <> prettyPrintType u
 
 type Minerva = [Expr]

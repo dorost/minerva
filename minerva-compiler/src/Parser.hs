@@ -78,17 +78,22 @@ ident = takeWhile1P Nothing (\c ->
     c/= ')'
     )
 
+pExpr :: Parser Expr
+pExpr = 
+    try (char '(' *> skipSpacing *> expr Nothing <* skipSpacing <* char ')')
+        <|> const Hole <$> char '?'
+        <|> Var <$> ident
+
+
 expr :: Maybe Expr -> Parser Expr
 expr Nothing = do
     skipSpacing
-    e <-  try (char '(' *> skipSpacing *> expr Nothing <* skipSpacing <* char ')')
-            <|> Var <$> ident
+    e <- pExpr
     skipSpacing
     try (expr (Just e)) <|> return e
 expr (Just e) = do
     skipSpacing
-    e2 <- try (char '(' *> skipSpacing *> expr Nothing <* skipSpacing <* char ')')
-         <|> Var <$> ident
+    e2 <- pExpr
     let app = App e e2
 
     try (expr (Just app)) <|> return app
@@ -116,7 +121,7 @@ typeArgs = do
     t <- try (char '(' *> typeArgs <* char ')' )
          <|> Basic <$> funType
     skipSpacing
-    To t <$> try (string "->" *> typeArgs)
+    TFun t <$> try (string "->" *> typeArgs)
          <|> return t
     
 funDef :: Parser Expr
