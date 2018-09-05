@@ -159,4 +159,4 @@ topLevel =
 
 parser :: Parser Minerva
 parser =
-    topLevel `sepBy` skipSpacing
+    Prelude.map defToLambda <$> topLevel `sepBy` skipSpacing

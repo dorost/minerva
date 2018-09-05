@@ -105,17 +105,27 @@ bindNames _ _ _ = error "Function has too many variables"
 
 -- check expressions
 -- Todo complex functions / expressions
-checkTypes :: Map.Map Text Type -> Minerva -> Maybe Problem
-checkTypes env (FunDecl name bs expr: ms) =
-        let 
-            tyFun =
-                fromMaybe (error (show name)) (Map.lookup name env)
-            (nEvn, nTyFun) = bindNames bs tyFun env
-            tyExpr = checkType expr nEvn
-    in
-        if tyExpr /= nTyFun
-            then Just (NotEqual tyExpr nTyFun)
-            else checkTypes env ms        
-checkTypes env (_:ms) =
-    checkTypes env ms
-checkTypes env  [] = Nothing
+-- checkTypes :: Map.Map Text Type -> Minerva -> Maybe Problem
+-- checkTypes env (FunDecl name bs expr: ms) =
+--         let 
+--             tyFun =
+--                 fromMaybe (error (show name)) (Map.lookup name env)
+--             (nEvn, nTyFun) = bindNames bs tyFun env
+--             tyExpr = checkType expr nEvn
+--     in
+--         if tyExpr /= nTyFun
+--             then Just (NotEqual tyExpr nTyFun)
+--             else checkTypes env ms        
+-- checkTypes env (_:ms) =
+--     checkTypes env ms
+-- checkTypes env  [] = Nothing
+
+checkTypes' :: Map.Map Text Scheme -> Minerva -> Maybe Text.Text
+checkTypes' env ((Bind bId expr):ms) = do
+    (res, _) <- runTI (typeInference env expr)
+    case res of
+        Left err -> Just err
+        Right t -> checkTypes' env ms
+checkTypes' env (_:ms) =
+    checkTypes' env ms
+checkTypes' env [] = Nothing

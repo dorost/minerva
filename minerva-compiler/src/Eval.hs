@@ -20,6 +20,8 @@ getToplevel expr@(FunDef name _) =
     Just [(name, expr)]
 getToplevel expr@(FunDecl name _ _) = 
     Just [(name, expr)]
+getToplevel (Bind name expr) = 
+    Just [(name, expr)]
 getTopLevel _ = Nothing
 
 loadProgram :: [Expr] -> Map.Map Text Expr
@@ -36,11 +38,16 @@ eval (FunDecl _ [] e2) env = eval e2 env
 eval e@(FunDecl _ _ _) env = return (e, env)
 eval (App expr1 e2) env = do
     (e1, nE) <- eval expr1 env
-    case (e1) of
+    case e1 of
         FunDecl name (b:bs) expr -> do
             (e3,_) <- eval e2 env
             let nEnv = Map.insert b e3 nE
                 nExpr = FunDecl name bs expr
+            eval nExpr nEnv
+        Lam b expr -> do
+            (e3,_) <- eval e2 env
+            let nEnv = Map.insert b e3 nE
+                nExpr = expr
             eval nExpr nEnv
         Tag name xs ->
             eval (Tag name (e2:xs)) env
@@ -51,4 +58,6 @@ eval (Match mExpr ps) env = do
     let ((Pattern _ bs, e):_) = (Prelude.filter (\((Pattern tag2 bs), _) -> tag1 == tag2) ps)
     let nEnv = Prelude.foldr (\(b, e2) ex -> Map.insert b e2 ex) env (Prelude.zip bs (Prelude.reverse vs))
     eval e nEnv
+eval expr@(Lam e x) env = 
+    return (expr, env)
 eval x _ = Left ("Not supported" <> pack (show x))

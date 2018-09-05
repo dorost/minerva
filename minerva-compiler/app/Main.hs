@@ -13,7 +13,7 @@ import AST
 
 main :: IO ()
 main = do
-    let fileName = "./examples/bool.mrv"
+    let fileName = "./examples/nat.mrv"
     f <- Data.Text.IO.readFile fileName
     
     let parseResult = runParser parser fileName f
@@ -27,7 +27,7 @@ main = do
             let typeDefs = getTypeDefs ast
             print typeDefs'
             print typeDefs
-            let typeChecks = checkTypes typeDefs ast
+            let typeChecks = checkTypes' typeDefs' ast
             print typeChecks
             let prog = loadProgram ast
             putStrLn "minerva loaded"
