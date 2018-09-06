@@ -13,7 +13,7 @@ import AST
 
 main :: IO ()
 main = do
-    let fileName = "./examples/id.mrv"
+    let fileName = "./examples/unit.mrv"
     f <- Data.Text.IO.readFile fileName
     
     let parseResult = runParser parser fileName f

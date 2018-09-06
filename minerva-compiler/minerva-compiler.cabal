@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a5b20dc823da3146c689967c424219938da4bdf68558b4146e82adf30efaf8d1
+-- hash: 53ef0e9730f1e1c644cd9b7384681d0bfdddbb5c4a666339a90678de8363686f
 
 name:           minerva-compiler
 version:        0.1.0.0
@@ -72,4 +72,5 @@ test-suite minerva-test
     , megaparsec
     , minerva-compiler
     , quickcheck-text
+    , text
   default-language: Haskell2010

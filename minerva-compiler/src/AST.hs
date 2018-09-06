@@ -18,14 +18,9 @@ data Expr
     | FunDecl Text [Text] Expr
     deriving Show
 
-
-toLambda :: [Text] -> Expr -> Expr
-toLambda [] e = e
-toLambda (a:args) e = Lam a (toLambda args e)
-
 defToLambda :: Expr -> Expr
 defToLambda (FunDecl funId args e) =
-    Bind funId (toLambda args e)
+    Bind funId (Prelude.foldr Lam e args)
 defToLambda e = e
 
 data Pattern =
