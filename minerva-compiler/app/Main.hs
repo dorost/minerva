@@ -13,7 +13,7 @@ import AST
 
 main :: IO ()
 main = do
-    let fileName = "./examples/nat.mrv"
+    let fileName = "./examples/id.mrv"
     f <- Data.Text.IO.readFile fileName
     
     let parseResult = runParser parser fileName f
@@ -24,9 +24,7 @@ main = do
         Right ast -> do
             print ast
             let typeDefs' = getTypeDefs' ast
-            let typeDefs = getTypeDefs ast
             print typeDefs'
-            print typeDefs
             let typeChecks = checkTypes' typeDefs' ast
             print typeChecks
             let prog = loadProgram ast
@@ -39,11 +37,12 @@ main = do
                         putStrLn ("Error: " <> pack (show err))
                     Right e -> do
                         print e
-                        print ()
                         let x = eval e prog
+                        let t = checkType' typeDefs' e
 
-                        case x of 
-                            Right (e2,_) -> putStrLn (prettyPrintExpr e2 <> " : " <> prettyPrintType (checkType e typeDefs))
-                            Left err -> putStrLn err
+                        case (t, x) of 
+                            (Just (Right t1, s1), Right (e2,_)) -> putStrLn (prettyPrintExpr e2 <> " : " <> prettyPrintType t1)
+                            (Just (Left err, _), _) -> putStrLn err
+                            (_, Left err) -> putStrLn err
                 return ()
 

@@ -45,6 +45,8 @@ data Type
     deriving (Show, Eq)
 
 prettyPrintType :: Type -> Text
+prettyPrintType (TVar t) =
+    t
 prettyPrintType (Basic t) =
     t
 prettyPrintType (TFun t u) =

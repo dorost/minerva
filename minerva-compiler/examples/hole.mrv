@@ -1,0 +1,8 @@
+B { 0 : B
+  }
+
+hole : B
+hole { ? }
+
+hole1 : B -> B
+hole1 { ? }

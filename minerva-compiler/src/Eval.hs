@@ -60,4 +60,7 @@ eval (Match mExpr ps) env = do
     eval e nEnv
 eval expr@(Lam e x) env = 
     return (expr, env)
-eval x _ = Left ("Not supported" <> pack (show x))
+eval Hole env = 
+    return (Hole, env)
+    
+eval x _ = Left ("Not supported: " <> pack (show x))

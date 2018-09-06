@@ -9,16 +9,18 @@ import AST
 import Data.Maybe
 import Data.List
 import Inference
-
-getTypeLiteral :: Expr -> Maybe Text
-getTypeLiteral t = 
-    case t of 
-        TypeDef t _ -> Just t
-        _ -> Nothing
+import Data.List (nub)
 
 getLast :: Type -> Text
 getLast (Basic x) = x
 getLast (TFun t1 t2) = getLast t2
+
+getType:: Expr -> Maybe [(Text, Type)]
+getType t = 
+    case t of 
+        TypeDef t ts ->
+                Just [(t, Basic t)]
+        _ -> Nothing
 
 getTypeDef :: Expr -> Maybe [(Text, Type)]
 getTypeDef t = 
@@ -29,12 +31,13 @@ getTypeDef t =
                         then (cns, u)
                         else error (show $ "Last argument of type constructor should be of type" <> t)
                     ) ts)
-        FunDef t ts -> Just [(t, ts)]
         _ -> Nothing
 
-data Problem =
-    NotEqual Type Type
-    deriving Show
+getFunDef :: Expr -> Maybe [(Text, Type)]
+getFunDef t =
+    case t of
+        FunDef t ts -> Just [(t, ts)]
+        _ -> Nothing
 
 addToMap :: (Text,  Type) -> Map.Map Text Type -> Map.Map Text Type
 addToMap (typeRef, ty) m = 
@@ -46,6 +49,10 @@ getTypeDefs :: Minerva -> Map.Map Text Type
 getTypeDefs =
     Prelude.foldr addToMap Map.empty . concat . mapMaybe getTypeDef
 
+getTypes :: Minerva -> Map.Map Text Type
+getTypes =
+    Prelude.foldr addToMap Map.empty . concat . mapMaybe getType
+    
 addToMap' :: (Text,  Type) -> Map.Map Text Scheme -> Map.Map Text Scheme
 addToMap' (typeRef, ty) m = 
     if Map.member typeRef m
@@ -53,72 +60,37 @@ addToMap' (typeRef, ty) m =
         else Map.insert typeRef (Scheme [] ty) m
     
 getTypeDefs' :: Minerva -> Map.Map Text.Text Scheme
-getTypeDefs' =
-    Prelude.foldr addToMap' Map.empty . concat . mapMaybe getTypeDef
+getTypeDefs' m =
+    let 
+        types = Prelude.foldr addToMap' Map.empty (concat (mapMaybe getType m)) 
+        typeDefs = Prelude.foldr addToMap' Map.empty (concat (mapMaybe getTypeDef m))
+        funDefs = Prelude.foldr addToMap' Map.empty (concat (mapMaybe getFunDef m))
+        funDefs' = fmap (unboundedToVar types) funDefs
+    in 
+        typeDefs `Map.union` funDefs'
+
+unbounded :: Map.Map Text.Text Scheme -> Type -> Maybe Text
+unbounded env (Basic x) = 
+    if not (Map.member x env) then
+        Just x
+    else Nothing
+unbounded _ _ = Nothing
+
+toVars :: [Text] -> Type -> Type
+toVars (x:xs) t@(Basic y) = if x == y then TVar y else (toVars xs t)
+toVars xs (TFun t1 t2) = TFun (toVars xs t1) (toVars xs t2) 
+toVars xs t = t
+
+unboundedToVar :: Map.Map Text.Text Scheme -> Scheme -> Scheme
+unboundedToVar env (Scheme vars t) =
+    let x = catMaybes $ map (unbounded env) (toList t)
     
+    in Scheme (nub $ vars ++ x) (toVars x t)
 
-stripApp :: Type -> Type -> Maybe Type
-stripApp (TFun x@(Basic t1) t2) y@(Basic t3) =
-    if x == y then Just t2 else Nothing
-stripApp _ _ =
-    Nothing
-
-checkPattern :: (Pattern, Expr) -> Map.Map Text Type -> (Type, Type)
-checkPattern (Pattern t bs, expr) env =
-    let tPattern = env Map.! t
-        (nEnv,pTy) = bindNames bs tPattern env
-    in
-        (pTy, checkType expr nEnv)
-
-checkType :: Expr -> Map.Map Text Type -> Type
-checkType (Var t) env =
-    fromMaybe (error ("Var not found " <> show t)) (Map.lookup t env)
-checkType (App t1 t2) env =
-    let ty1 = checkType t1 env
-        ty2 = checkType t2 env
-        nTy = stripApp ty1 ty2
-    in
-        fromMaybe (error ("unexpected: checkType" <> show ty1 <> show ty2)) nTy
-checkType (Tag t _) env =
-    fromMaybe (error ("Tag not found " <> show t)) (Map.lookup t env)
-checkType (Match e ps) env =
-    let ty1 = checkType e env
-        (ty:tys) = map (\p -> checkPattern p env) ps
-    in
-        if any (/=snd ty) (map snd tys) then error "All expressions in match should be equal"
-        else
-        if
-           any (/=ty1) (map fst tys) then error "All Patterns should be of correct type"
-        else
-            snd ty    
-checkType Hole env =
-    error "Hole supported yet"
-checkType e _ = 
-    error ("not supported:" <> show e)
-
-bindNames :: [Text] -> Type -> Map.Map Text Type -> (Map.Map Text Type, Type)
-bindNames [] rem env = (env, rem)
-bindNames (b: bs) (TFun t1 t2) env =
-    bindNames bs t2 (Map.insert b t1 env)
-bindNames _ _ _ = error "Function has too many variables"
-
-
--- check expressions
--- Todo complex functions / expressions
--- checkTypes :: Map.Map Text Type -> Minerva -> Maybe Problem
--- checkTypes env (FunDecl name bs expr: ms) =
---         let 
---             tyFun =
---                 fromMaybe (error (show name)) (Map.lookup name env)
---             (nEvn, nTyFun) = bindNames bs tyFun env
---             tyExpr = checkType expr nEvn
---     in
---         if tyExpr /= nTyFun
---             then Just (NotEqual tyExpr nTyFun)
---             else checkTypes env ms        
--- checkTypes env (_:ms) =
---     checkTypes env ms
--- checkTypes env  [] = Nothing
+checkType' :: Map.Map Text Scheme -> Expr -> Maybe (Either Text Type, TIState)
+checkType' env expr = do
+    runTI (typeInference env expr)
+    --return (res, s)
 
 checkTypes' :: Map.Map Text Scheme -> Minerva -> Maybe Text.Text
 checkTypes' env ((Bind bId expr):ms) = do

@@ -61,19 +61,17 @@ generalize :: TypeEnv -> Type -> Scheme
 generalize env t = Scheme vars t
     where vars = Set.toList ((ftv t) Set.\\ (ftv env))
 
-data TIEnv = TIEnv{ }
-
 data TIState = TIState {tiSupply :: Int,
-                        tiSubst :: Subst }
-
+                        tiSubst :: Subst } deriving Show
+                        
 -- TODO use data type instead of text for errors
-type TI a = ErrorT Text.Text (ReaderT TIEnv (StateT TIState Maybe)) a
+type TI a = ErrorT Text.Text (ReaderT () (StateT TIState Maybe)) a
 
 runTI :: TI a -> Maybe (Either Text.Text a, TIState)
 runTI t = do
     (res, st) <- runStateT (runReaderT (runErrorT t) initTIEnv) initTIState
     return (res, st)
-    where initTIEnv = TIEnv{ }
+    where initTIEnv = ()
           initTIState = TIState{tiSupply = 0,
           tiSubst = Map.empty }
 
@@ -143,7 +141,10 @@ ti env (Match e1 ps) = do
                 nEnv = foldr (\(b, t) env' -> Map.insert b (Scheme [] t) env') env (zip bs ty)
             in ti nEnv e) ps
     return (sub, ty)
-
+ti env (Hole) = do
+    tv <- newTyVar "a"
+    
+    return (nullSubst, tv)
 
 ti env e = do
     throwError $ "unsupported: " <> Text.pack (show e)
