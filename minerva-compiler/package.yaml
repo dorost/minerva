@@ -1,0 +1,60 @@
+name:                minerva-compiler
+version:             0.1.0.0
+github:              "githubuser/minerva"
+license:             BSD3
+author:              "Daniël Heres"
+maintainer:          "danielheres@gmail.com"
+copyright:           "2018 Daniël Heres"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/githubuser/minerva#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+
+library:
+  source-dirs: src
+  dependencies:
+  - megaparsec
+  - text
+  - containers
+  - mtl
+
+executables:
+  minerva-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - minerva-compiler
+    - megaparsec
+    - text
+
+tests:
+  minerva-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - minerva-compiler
+    - hspec
+    - QuickCheck
+    - megaparsec
+    - quickcheck-text
+    - text

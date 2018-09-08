@@ -1,0 +1,26 @@
+B { 0 : B
+  | 1 : B
+  }
+
+false : B
+false { 0 }
+
+true : B
+true { 1 }
+
+x : B
+x { false }
+
+or : B -> B -> B
+or a b { case a
+ { 1 => 1
+ | 0 => b
+ }
+}
+
+and : B -> B -> B
+and a b { case a 
+ { 1 => b
+ | 0 => 0
+ }
+}

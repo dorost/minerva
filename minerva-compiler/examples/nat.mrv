@@ -1,0 +1,22 @@
+N { Zero : N
+  | Succ : N -> N
+  }
+
+zero : N
+zero { Zero }
+
+one : N
+one { Succ zero }
+
+two : N
+two { Succ one }
+
+succ : N -> N
+succ { Succ }
+
+add : N -> N -> N
+add a b { case a
+    { Zero => b
+    | Succ c => Succ (add c b)
+    }
+}
